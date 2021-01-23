@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:numberpicker/numberpicker.dart';
 
 void main() {
   runApp(MyApp());
@@ -29,13 +30,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  final _timenumList = new List<int>.generate(59, (i) => i + 1);
-  var _durationTime = '59';
+  // final _timenumList = [for(int i=1; i<=59; i++) i];
+  var _timeLimitH = 1, _timeLimitM = 0, _durationTime = 0, _durationUnit = '분';
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -55,22 +54,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Text("00:00"),
-                  Text("동안"),
+                  Text("알람 시간"),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center, //Center Row contents horizontally,
+                    children: <Widget>[
+                      time_limit_Hpicker(),
+                      Text("시간"),
+
+                      time_limit_Mpicker(),
+                      Text("분"),
+                    ],
+                  ),
                   Row(
                     children: <Widget>[
-                      // DropdownButton(
-                      //   value: _durationTime,
-                      //   items: _timenumList.map((value) => DropdownMenuItem(
-                      //     value: value,
-                      //     child: Text(value.toString()),
-                      //   )).toList(),
-                      //   onChanged: (value){
-                      //     setState(() {
-                      //       _durationTime = value;
-                      //     });
-                      //   },
-                      // ),
+
                     ],
                   ),
                   SizedBox(
@@ -88,10 +85,38 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
+
             ),
           ),
         ),
       ),
     );
   }
+
+  Widget time_limit_Hpicker(){
+    return NumberPicker.integer(
+        initialValue: _timeLimitH,
+        minValue: 0,
+        maxValue: 12,
+        selectedTextStyle: TextStyle(fontSize: 35, color: Colors.blue),
+        textStyle: TextStyle(fontSize: 16, color: Colors.black),
+        listViewWidth: 70,
+        itemExtent: 50.0,
+        onChanged: (newValue) => setState(() => _timeLimitH = newValue));
+  }
+  Widget time_limit_Mpicker(){
+    return NumberPicker.integer(
+        initialValue: _timeLimitM,
+        minValue: 0,
+        maxValue: 59,
+        step: 10,
+        selectedTextStyle: TextStyle(fontSize: 35, color: Colors.blue),
+        textStyle: TextStyle(fontSize: 16, color: Colors.black),
+        listViewWidth: 50,
+        itemExtent: 50.0,
+        zeroPad: true,
+        onChanged: (newValue) => setState(() => _timeLimitM = newValue));
+  }
+
+
 }
