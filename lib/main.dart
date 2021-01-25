@@ -3,22 +3,40 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:numberpicker/numberpicker.dart';
+import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter_material_pickers/flutter_material_pickers.dart';
+import 'package:google_fonts/google_fonts.dart';
+// https://fonts.google.com/specimen/Chakra+Petch?preview.text=6:57&preview.text_type=custom&category=Serif,Sans+Serif,Display,Monospace&sidebar.open=true&selection.family=Chakra+Petch:wght@600
+
+var _title = 'Focus Up';
+var _appbarTitle = '집중해';
 
 void main() {
-  runApp(MyApp());
+  runApp(Main());
 }
 
-class MyApp extends StatelessWidget {
+class Main extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Focus Up',
-      home: MyHomePage(title: '집중해'),
+      title: _title,
+      home: MyHomePage(title: _appbarTitle),
     );
   }
 }
+
+class Run extends StatelessWidget {
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: _title,
+      home: RunPage(title: _appbarTitle),
+    );
+  }
+}
+
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -28,15 +46,13 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-
+var _timeLimitH = 1, _timeLimitM = 0, _durationTime = 5;
+final _durationUnitList = ["초", "분"];
+var _durationUnit = "분";
+var selectedIndex = 1;
+var _touchNumForClose = 200;
 
 class _MyHomePageState extends State<MyHomePage> {
-
-  // final _timenumList = [for(int i=1; i<=59; i++) i];
-  var _timeLimitH = 1, _timeLimitM = 0, _durationTime = 5;
-  final _durationUnitList = ["초", "분"];
-  var _durationUnit = "분";
-  var selectedIndex = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -81,14 +97,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       Text("반복 시간"),
                       Row(
                         children: <Widget>[
-                          durationTime_picker(),
                           customRadio(_durationUnitList[0],0),
                           customRadio(_durationUnitList[1],1),
                         ],
                       ),
                     ],
                   ),
-                  Text("$_timeLimitH:$_timeLimitM , $_durationTime$_durationUnit"),
                   SizedBox(
                       width: 100,
                       height: 100,
@@ -99,7 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           color: Colors.blue,
                           elevation: 0.0,
-                          onPressed: () {}
+                          onPressed: _showDialog,
                       )
                   ),
                 ],
@@ -120,8 +134,10 @@ class _MyHomePageState extends State<MyHomePage> {
         textStyle: TextStyle(fontSize: 16, color: Colors.black),
         listViewWidth: 80,
         zeroPad: false,
-        onChanged: (newValue) => setState(() => _timeLimitH = newValue));
+        onChanged: (newValue) => setState(() => _timeLimitH = newValue)
+      );
   }
+
   Widget time_limit_Mpicker(){
     return NumberPicker.integer(
         initialValue: _timeLimitM,
@@ -165,5 +181,90 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void _showDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          titlePadding: EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 15.0),
+          contentPadding: EdgeInsets.fromLTRB(30.0, 0, 30.0, 5.0),
+          actionsPadding: EdgeInsets.fromLTRB(0, 0, 10.0, 5.0),
+          title: Text("$_timeLimitH시간 $_timeLimitM분 동안 $_durationTime$_durationUnit마다 알람"),
+          content: SingleChildScrollView(
+            child: Text("알람을 시작하겠습니까? $_touchNumForClose회 터치해야 강제종료됩니다.")
+          ),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30.0)
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("시작"),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Run()),
+                );
+                // Navigator.pop(context);
+              },
+            ),
+            FlatButton(
+              child: Text("취소"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
 
+
+class RunPage extends StatefulWidget {
+  RunPage({Key key, this.title}) : super(key: key);
+  final String title;
+
+  @override
+  _RunPageState createState() => _RunPageState();
+}
+
+class _RunPageState extends State<RunPage>{
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(widget.title),
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
+      ),
+      extendBodyBehindAppBar: true,
+      body: Container(
+        color: Colors.blue,
+        child: Center(
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(200.0),
+            ),
+            elevation: 0.0,
+            color: Colors.red,
+            child: Container(
+              width: 350,
+              height: 350,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text("$_touchNumForClose회 연속 터치 시 강제종료")
+                ]
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
