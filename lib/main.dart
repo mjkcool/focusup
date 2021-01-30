@@ -8,6 +8,7 @@ import 'package:flutter_material_pickers/flutter_material_pickers.dart';
 import 'package:google_fonts/google_fonts.dart';
 // https://fonts.google.com/specimen/Chakra+Petch?preview.text=6:57&preview.text_type=custom&category=Serif,Sans+Serif,Display,Monospace&sidebar.open=true&selection.family=Chakra+Petch:wght@600
 
+
 var _title = 'Focus Up';
 var _appbarTitle = '집중해';
 
@@ -26,17 +27,6 @@ class Main extends StatelessWidget {
   }
 }
 
-class Run extends StatelessWidget {
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: _title,
-      home: RunPage(title: _appbarTitle),
-    );
-  }
-}
-
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -46,13 +36,13 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-var _timeLimitH = 1, _timeLimitM = 0, _durationTime = 5;
-final _durationUnitList = ["초", "분"];
-var _durationUnit = "분";
-var selectedIndex = 1;
-var _touchNumForClose = 200;
 
 class _MyHomePageState extends State<MyHomePage> {
+
+  int _timeLimitH = 1, _timeLimitM = 0, _durationTime = 5;
+  final _durationUnitList = ["초", "분"];
+  String _durationUnit = "분";
+  int selectedIndex = 1, _touchNumForClose = 200;
 
   @override
   Widget build(BuildContext context) {
@@ -91,10 +81,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     ],
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Text("반복 시간"),
+                      SizedBox(
+                        width: 30,
+                      ),
+                      durationTime_picker(),
                       Row(
                         children: <Widget>[
                           customRadio(_durationUnitList[0],0),
@@ -103,6 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ],
                   ),
+                  Text("$_timeLimitH:$_timeLimitM 동안 $_durationTime$_durationUnit마다 반복, $_touchNumForClose"),
                   SizedBox(
                       width: 100,
                       height: 100,
@@ -190,21 +185,24 @@ class _MyHomePageState extends State<MyHomePage> {
         return AlertDialog(
           titlePadding: EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 15.0),
           contentPadding: EdgeInsets.fromLTRB(30.0, 0, 30.0, 5.0),
-          actionsPadding: EdgeInsets.fromLTRB(0, 0, 10.0, 5.0),
+          actionsPadding: EdgeInsets.fromLTRB(0, 0, 5.0, 5.0),
           title: Text("$_timeLimitH시간 $_timeLimitM분 동안 $_durationTime$_durationUnit마다 알람"),
           content: SingleChildScrollView(
             child: Text("알람을 시작하겠습니까? $_touchNumForClose회 터치해야 강제종료됩니다.")
           ),
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30.0)
+              borderRadius: BorderRadius.circular(35.0)
           ),
           actions: <Widget>[
             FlatButton(
               child: Text("시작"),
               onPressed: () {
+                int durationTime, timeLimit = _timeLimitM*60 + _timeLimitH*360;
+                if(_durationUnit=='초') durationTime = _durationTime;
+                else durationTime = _durationTime*60;
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Run()),
+                  MaterialPageRoute(builder: (context) => RunPage(title: widget.title, timeLimit: timeLimit, durationTime: durationTime, touchNumForClose: _touchNumForClose)),
                 );
                 // Navigator.pop(context);
               },
@@ -223,15 +221,19 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 
+
 class RunPage extends StatefulWidget {
-  RunPage({Key key, this.title}) : super(key: key);
   final String title;
+  final int timeLimit, durationTime, touchNumForClose;
+  RunPage({Key key, this.title, @required this.timeLimit, @required this.durationTime, @required this.touchNumForClose}) : super(key: key);
 
   @override
   _RunPageState createState() => _RunPageState();
 }
 
+
 class _RunPageState extends State<RunPage>{
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -258,7 +260,7 @@ class _RunPageState extends State<RunPage>{
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Text("$_touchNumForClose회 연속 터치 시 강제종료")
+                  Text("${widget.touchNumForClose}회 연속 터치 시 강제종료, ${widget.timeLimit}, ${widget.durationTime}")
                 ]
               ),
             ),
