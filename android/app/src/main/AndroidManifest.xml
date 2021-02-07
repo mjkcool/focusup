@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="kr.mjkcool.focusup">
    <application
-        android:label="focusup"
-        android:icon="@mipmap/ic_launcher">
+        android:label="집중해"
+        android:icon="@mipmap/ic_focusup_logo">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -54,9 +54,7 @@
        </receiver>
 
 
-   </application>
-
+    </application>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
-
 </manifest>

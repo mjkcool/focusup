@@ -204,6 +204,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   context,
                   MaterialPageRoute(builder: (context) => RunPage(title: widget.title, timeLimit: timeLimit, durationTime: durationTime, touchNumForClose: _touchNumForClose)),
                 );
+                AndroidAlarmManager.periodic(Duration(seconds: 3), 0, showprint);
                 // Navigator.pop(context);
               },
             ),
@@ -220,6 +221,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+showprint(){
+  print('지창민결혼하자');
+}
 
 
 class RunPage extends StatefulWidget {
@@ -227,13 +231,14 @@ class RunPage extends StatefulWidget {
   final int timeLimit, durationTime, touchNumForClose;
   RunPage({Key key, this.title, @required this.timeLimit, @required this.durationTime, @required this.touchNumForClose}) : super(key: key);
 
+
+
   @override
   _RunPageState createState() => _RunPageState();
 }
 
 
 class _RunPageState extends State<RunPage>{
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
