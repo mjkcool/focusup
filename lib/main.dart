@@ -1,3 +1,6 @@
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -44,6 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _durationUnit = "분";
   int selectedIndex = 1, _touchNumForClose = 200;
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,71 +55,70 @@ class _MyHomePageState extends State<MyHomePage> {
         centerTitle: true,
         leading: Icon(Icons.menu),
         title: Text(widget.title),
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.blue,
         elevation: 0.0,
       ),
-      extendBodyBehindAppBar: true,
-      body: Container(
-        color: Colors.blue,
-        child: Center(
-          child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(200.0),
-            ),
-            elevation: 0.0,
-            child: Container(
-              width: 350,
-              height: 350,
-              child: Column(
+      body: Center(
+        child: Container(
+          color: Colors.blue,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Text("알람 시간", style: TextStyle(fontSize: 30),),
+              Container(
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white),
+                    borderRadius: BorderRadius.all(
+                        Radius.circular(200) //                 <--- border radius here
+                    ),
+                ),
+                width: 250, height: 250,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    time_limit_Hpicker(),
+                    Text(":", style: TextStyle(fontSize: 40, color: Colors.white),),
+                    time_limit_Mpicker(),
+                  ],
+                ),
+              ),
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Text("알람 시간"),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      time_limit_Hpicker(),
-                      Text(":", style: TextStyle(fontSize: 40, color: Colors.blue),),
-                      time_limit_Mpicker(),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Text("반복 시간"),
-                      SizedBox(
-                        width: 30,
-                      ),
-                      durationTime_picker(),
-                      Row(
-                        children: <Widget>[
-                          customRadio(_durationUnitList[0],0),
-                          customRadio(_durationUnitList[1],1),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Text("$_timeLimitH:$_timeLimitM 동안 $_durationTime$_durationUnit마다 반복, $_touchNumForClose"),
+                  Text("반복 시간", style: TextStyle(fontSize: 20),),
                   SizedBox(
-                      width: 100,
-                      height: 100,
-                      child: RaisedButton(
-                          child: Text('시작'),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(200.0),
-                          ),
-                          color: Colors.blue,
-                          elevation: 0.0,
-                          onPressed: _showDialog,
-                      )
+                    width: 30,
+                  ),
+                  durationTime_picker(),
+                  Row(
+                    children: <Widget>[
+                      customRadio(_durationUnitList[0],0),
+                      customRadio(_durationUnitList[1],1),
+                    ],
                   ),
                 ],
               ),
-            ),
+              FlatButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100.0),
+                    side: BorderSide(color: Colors.white),
+                ),
+                color: Colors.transparent,
+                textColor: Colors.white,
+                padding: EdgeInsets.all(14.0),
+                onPressed: _showDialog,
+                child: Text(
+                  '시작',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
+        )
       ),
     );
   }
@@ -124,9 +127,9 @@ class _MyHomePageState extends State<MyHomePage> {
     return NumberPicker.integer(
         initialValue: _timeLimitH,
         minValue: 0,
-        maxValue: 12,
-        selectedTextStyle: TextStyle(fontSize: 45, color: Colors.blue),
-        textStyle: TextStyle(fontSize: 16, color: Colors.black),
+        maxValue: 11,
+        selectedTextStyle: TextStyle(fontSize: 45, color: Colors.white),
+        textStyle: TextStyle(fontSize: 25, color: Colors.white38),
         listViewWidth: 80,
         zeroPad: false,
         onChanged: (newValue) => setState(() => _timeLimitH = newValue)
@@ -139,8 +142,8 @@ class _MyHomePageState extends State<MyHomePage> {
         minValue: 0,
         maxValue: 59,
         step: 10,
-        selectedTextStyle: TextStyle(fontSize: 45, color: Colors.blue),
-        textStyle: TextStyle(fontSize: 16, color: Colors.black),
+        selectedTextStyle: TextStyle(fontSize: 45, color: Colors.white),
+        textStyle: TextStyle(fontSize: 25, color: Colors.white38),
         listViewWidth: 80,
         zeroPad: true,
         onChanged: (newValue) => setState(() => _timeLimitM = newValue));
@@ -151,8 +154,8 @@ class _MyHomePageState extends State<MyHomePage> {
         minValue: 5,
         maxValue: 60,
         step: 5,
-        selectedTextStyle: TextStyle(fontSize: 26, color: Colors.black),
-        textStyle: TextStyle(fontSize: 16, color: Colors.black),
+        selectedTextStyle: TextStyle(fontSize: 26, color: Colors.white),
+        textStyle: TextStyle(fontSize: 16, color: Colors.white38),
         listViewWidth: 50,
         zeroPad: false,
         onChanged: (newValue) => setState(() => _durationTime = newValue));
@@ -165,7 +168,7 @@ class _MyHomePageState extends State<MyHomePage> {
       color: Colors.transparent,
       splashColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-      child: Text(txt,style: TextStyle(fontSize: selectedIndex == index? 18 : 16, color: selectedIndex == index? Colors.blue : Colors.grey),),
+      child: Text(txt,style: TextStyle(fontSize: selectedIndex == index? 18 : 16, color: selectedIndex == index? Colors.white : Colors.white38),),
     );
   }
 
@@ -174,6 +177,10 @@ class _MyHomePageState extends State<MyHomePage> {
       selectedIndex = index;
       _durationUnit = _durationUnitList[index];
     });
+  }
+
+  void showprint(){
+    print("실행");
   }
 
   void _showDialog() {
@@ -191,7 +198,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Text("알람을 시작하겠습니까? $_touchNumForClose회 터치해야 강제종료됩니다.")
           ),
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(35.0)
+              borderRadius: BorderRadius.circular(20.0)
           ),
           actions: <Widget>[
             FlatButton(
@@ -204,7 +211,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   context,
                   MaterialPageRoute(builder: (context) => RunPage(title: widget.title, timeLimit: timeLimit, durationTime: durationTime, touchNumForClose: _touchNumForClose)),
                 );
-                AndroidAlarmManager.periodic(Duration(seconds: 3), 0, showprint);
+                //AndroidAlarmManager.periodic(Duration(seconds: 60), 0, showprint);
+                print("무야호~");
                 // Navigator.pop(context);
               },
             ),
@@ -219,10 +227,6 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
-}
-
-showprint(){
-  print('지창민결혼하자');
 }
 
 
