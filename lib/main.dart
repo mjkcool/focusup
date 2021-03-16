@@ -62,59 +62,69 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Container(
           color: Colors.blue,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Text("알람 시간", style: TextStyle(fontSize: 30),),
-              Container(
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white),
-                    borderRadius: BorderRadius.all(
-                        Radius.circular(200) //                 <--- border radius here
-                    ),
-                ),
-                width: 250, height: 250,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+              Column(
                   children: <Widget>[
-                    time_limit_Hpicker(),
-                    Text(":", style: TextStyle(fontSize: 40, color: Colors.white),),
-                    time_limit_Mpicker(),
-                  ],
-                ),
+                    SizedBox(height: 50,),
+                    Text("알람 시간", style: TextStyle(fontSize: 30),),
+                    SizedBox(height: 40,),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white),
+                        borderRadius: BorderRadius.all(
+                            Radius.circular(200) //                 <--- border radius here
+                        ),
+                      ),
+                      width: 250, height: 250,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          time_limit_Hpicker(),
+                          Text(":", style: TextStyle(fontSize: 40, color: Colors.white),),
+                          time_limit_Mpicker(),
+                        ],
+                      ),
+                    ),
+                  ]
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
+              Column(
                 children: <Widget>[
-                  Text("반복 시간", style: TextStyle(fontSize: 20),),
-                  SizedBox(
-                    width: 30,
-                  ),
-                  durationTime_picker(),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      customRadio(_durationUnitList[0],0),
-                      customRadio(_durationUnitList[1],1),
+                      Text("반복 시간", style: TextStyle(fontSize: 20),),
+                      SizedBox(width: 30),
+                      durationTime_picker(),
+                      Row(
+                        children: <Widget>[
+                          customRadio(_durationUnitList[0],0),
+                          customRadio(_durationUnitList[1],1),
+                        ],
+                      ),
                     ],
                   ),
-                ],
-              ),
-              FlatButton(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(100.0),
-                    side: BorderSide(color: Colors.white),
-                ),
-                color: Colors.transparent,
-                textColor: Colors.white,
-                padding: EdgeInsets.all(14.0),
-                onPressed: _showDialog,
-                child: Text(
-                  '시작',
-                  style: TextStyle(
-                    fontSize: 20.0,
+                  SizedBox(height: 40,),
+                  FlatButton(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(100.0),
+                      side: BorderSide(color: Colors.white),
+                    ),
+                    color: Colors.transparent,
+                    textColor: Colors.white,
+                    padding: EdgeInsets.all(14.0),
+                    onPressed: _showDialog,
+                    child: Text(
+                      '시작',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                      ),
+                    ),
                   ),
-                ),
+                  SizedBox(height: 60,),
+                ],
               ),
             ],
           ),
@@ -204,15 +214,16 @@ class _MyHomePageState extends State<MyHomePage> {
             FlatButton(
               child: Text("시작"),
               onPressed: () {
-                int durationTime, timeLimit = _timeLimitM*60 + _timeLimitH*360;
+                int durationTime, timeLimit = _timeLimitM + _timeLimitH*60; //분단위
+                int raw_durationTime = _durationTime;
                 if(_durationUnit=='초') durationTime = _durationTime;
                 else durationTime = _durationTime*60;
-                Navigator.push(
+                Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => RunPage(title: widget.title, timeLimit: timeLimit, durationTime: durationTime, touchNumForClose: _touchNumForClose)),
+                  MaterialPageRoute(builder: (context) => RunPage(title: widget.title, timeLimit: timeLimit, durationTime: durationTime, raw_durationTime: raw_durationTime, durationUnit: _durationUnit, touchNumForClose: _touchNumForClose)),
+                  (Route<dynamic> route) => false,
                 );
-                //AndroidAlarmManager.periodic(Duration(seconds: 60), 0, showprint);
-                print("무야호~");
+                AndroidAlarmManager.periodic(Duration(seconds: 10), 0, showprint);
                 // Navigator.pop(context);
               },
             ),
@@ -231,11 +242,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
 class RunPage extends StatefulWidget {
-  final String title;
-  final int timeLimit, durationTime, touchNumForClose;
-  RunPage({Key key, this.title, @required this.timeLimit, @required this.durationTime, @required this.touchNumForClose}) : super(key: key);
-
-
+  final String title, durationUnit;
+  final int timeLimit, durationTime, raw_durationTime, touchNumForClose;
+  RunPage({Key key, this.title, @required this.timeLimit, @required this.durationTime, @required this.raw_durationTime, @required this.durationUnit, @required this.touchNumForClose}) : super(key: key);
 
   @override
   _RunPageState createState() => _RunPageState();
@@ -249,31 +258,35 @@ class _RunPageState extends State<RunPage>{
       appBar: AppBar(
         centerTitle: true,
         title: Text(widget.title),
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.blue,
         elevation: 0.0,
       ),
-      extendBodyBehindAppBar: true,
-      body: Container(
-        color: Colors.blue,
-        child: Center(
-          child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(200.0),
-            ),
-            elevation: 0.0,
-            color: Colors.red,
-            child: Container(
-              width: 350,
-              height: 350,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Text("${widget.touchNumForClose}회 연속 터치 시 강제종료, ${widget.timeLimit}, ${widget.durationTime}")
-                ]
+      body: Center(
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          color: Colors.blue,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(height: 50,),
+              Text("리마인더 실행 중", style: TextStyle(fontSize: 30),),
+              SizedBox(height: 40,),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.all(
+                      Radius.circular(200) //                 <--- border radius here
+                  ),
+                ),
+                width: 250, height: 250,
+                child: Center(child: Text("${widget.timeLimit}", style: TextStyle(fontSize: 40, color: Colors.white),),),
               ),
-            ),
-          ),
+              SizedBox(height: 50,),
+              Text("${widget.touchNumForClose}회 연속 터치 시 강제종료", style: TextStyle(fontSize: 20, color: Colors.white54),),
+              SizedBox(height: 40,),
+              Text("${widget.raw_durationTime} ${widget.durationUnit} 마다 알림", style: TextStyle(fontSize: 35),),
+            ],
+          )
         ),
       ),
     );
